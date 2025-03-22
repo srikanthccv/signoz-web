@@ -254,9 +254,9 @@ FROM
         (
             SELECT DISTINCT fingerprint
             FROM signoz_metrics.time_series_v4_1day
-            WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv({{.start_timestamp_ms}}, 86400000) * 86400000) AND (unix_milli < {{.end_timestamp_ms}}) AND JSONExtractString(labels, 'service_name') = 'frontend'
+            WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv($start_timestamp_ms, 86400000) * 86400000) AND (unix_milli < $end_timestamp_ms) AND JSONExtractString(labels, 'service_name') = 'frontend'
         ) AS filtered_time_series USING (fingerprint)
-        WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= {{.start_timestamp_ms}}) AND (unix_milli < {{.end_timestamp_ms}})
+        WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= $start_timestamp_ms) AND (unix_milli < $end_timestamp_ms)
         GROUP BY
             fingerprint,
             ts
@@ -300,9 +300,9 @@ FROM
             (
                 SELECT DISTINCT fingerprint
                 FROM signoz_metrics.time_series_v4_1day
-                WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv({{.start_timestamp_ms}}, 86400000) * 86400000) AND (unix_milli < {{.end_timestamp_ms}}) AND JSONExtractString(labels, 'service_name') = 'redis' AND (JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'])
+                WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv($start_timestamp_ms, 86400000) * 86400000) AND (unix_milli < $end_timestamp_ms) AND JSONExtractString(labels, 'service_name') = 'redis' AND (JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'])
             ) AS filtered_time_series USING (fingerprint)
-            WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= {{.start_timestamp_ms}}) AND (unix_milli <= {{.end_timestamp_ms}})
+            WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= $start_timestamp_ms) AND (unix_milli <= $end_timestamp_ms)
             GROUP BY
                 fingerprint,
                 ts
@@ -336,9 +336,9 @@ INNER JOIN
             (
                 SELECT DISTINCT fingerprint
                 FROM signoz_metrics.time_series_v4_1day
-                WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv({{.start_timestamp_ms}}, 86400000) * 86400000) AND (unix_milli < {{.end_timestamp_ms}}) AND JSONExtractString(labels, 'service_name') = 'redis'
+                WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv($start_timestamp_ms, 86400000) * 86400000) AND (unix_milli < $end_timestamp_ms) AND JSONExtractString(labels, 'service_name') = 'redis'
             ) AS filtered_time_series USING (fingerprint)
-            WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= {{.start_timestamp_ms}}) AND (unix_milli <= {{.end_timestamp_ms}})
+            WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= $start_timestamp_ms) AND (unix_milli <= $end_timestamp_ms)
             GROUP BY
                 fingerprint,
                 ts
@@ -387,9 +387,9 @@ FROM
                     JSONExtractString(labels, 'le') AS le,
                     fingerprint
                 FROM signoz_metrics.time_series_v4_1day
-                WHERE (metric_name = 'signoz_latency_bucket') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv({{.start_timestamp_ms}}, 86400000) * 86400000) AND (unix_milli < {{.end_timestamp_ms}}) AND JSONExtractString(labels, 'service_name') = 'frontend'
+                WHERE (metric_name = 'signoz_latency_bucket') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv($start_timestamp_ms, 86400000) * 86400000) AND (unix_milli < $end_timestamp_ms) AND JSONExtractString(labels, 'service_name') = 'frontend'
             ) AS filtered_time_series USING (fingerprint)
-            WHERE (metric_name = 'signoz_latency_bucket') AND (unix_milli >= {{.start_timestamp_ms}}) AND (unix_milli <= {{.end_timestamp_ms}})
+            WHERE (metric_name = 'signoz_latency_bucket') AND (unix_milli >= $start_timestamp_ms) AND (unix_milli <= $end_timestamp_ms)
             GROUP BY
                 fingerprint,
                 le,
@@ -419,7 +419,7 @@ SigNoz supports using variables in queries. This allows you to create a single d
 
 #### Request rate for a service
 
-The variable `{{.service_name}}` is used to get the service name from the variable. The variable is replaced with the service name when the query is executed.
+The variable `$service_name` is used to get the service name from the variable. The variable is replaced with the service name when the query is executed.
 
 ```sql
 SELECT
@@ -441,9 +441,9 @@ FROM
         (
             SELECT DISTINCT fingerprint
             FROM signoz_metrics.time_series_v4_1day
-            WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv({{.start_timestamp_ms}}, 86400000) * 86400000) AND (unix_milli < {{.end_timestamp_ms}}) AND JSONExtractString(labels, 'service_name') = {{.service_name}}
+            WHERE (metric_name = 'signoz_calls_total') AND (temporality = 'Cumulative') AND (unix_milli >= intDiv($start_timestamp_ms, 86400000) * 86400000) AND (unix_milli < $end_timestamp_ms) AND JSONExtractString(labels, 'service_name') = $service_name
         ) AS filtered_time_series USING (fingerprint)
-        WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= {{.start_timestamp_ms}}) AND (unix_milli < {{.end_timestamp_ms}})
+        WHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= $start_timestamp_ms) AND (unix_milli < $end_timestamp_ms)
         GROUP BY
             fingerprint,
             ts
@@ -462,5 +462,5 @@ ORDER BY ts ASC
 
 The following variables are available by default:
 
-- `{{.start_timestamp_ms}}` - This is the start time of the query in milliseconds
-- `{{.end_timestamp_ms}}` - This is the end time of the query in milliseconds
+- `$start_timestamp_ms` - This is the start time of the query in milliseconds
+- `$end_timestamp_ms` - This is the end time of the query in milliseconds

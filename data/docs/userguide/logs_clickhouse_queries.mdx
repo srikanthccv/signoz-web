@@ -99,8 +99,8 @@ In the new schema for logs i.e `distributed_logs_v2`, we have a new column
 `ts_bucket_start` which is used to store the start timestamp of the bucket. This is used for faster filtering on timestamp attribute.
 
 How to use this column in the queries?
-If your timestamp query is `timestamp BETWEEN {{.start_datetime}} AND {{.end_datetime}}` then you will have to add 
- `ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}`
+If your timestamp query is `timestamp BETWEEN $start_datetime AND $end_datetime` then you will have to add 
+ `$ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp`
 
 We have added -1800, as bucketing is done in 30 minute intervals.
 
@@ -127,7 +127,7 @@ Eg: If your `keyname` is `status` of `dataType` `string` and `type` `attribute`,
 In the above example, if `status` is an [selected field](#selected-attributesresources-) , then it can be referenced as `attribute_string_status`
 </Admonition>
 
-We will use two variables i.e `{{.start_timestamp_nano}}` and  `{{.end_timestamp_nano}}` while writing our queries to specify the time range. 
+We will use two variables i.e `$start_timestamp_nano` and  `$end_timestamp_nano` while writing our queries to specify the time range. 
 
 ### Timeseries
 
@@ -143,8 +143,8 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY ts 
 ORDER BY ts ASC;
 ```
@@ -158,8 +158,8 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}} AND
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp AND
     mapContains(attributes_string, 'container_name')
 GROUP BY container_name, ts
 ORDER BY ts ASC;
@@ -173,9 +173,9 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND 
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND 
     severity_text='INFO' AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY ts 
 ORDER BY ts ASC;
 ```
@@ -188,11 +188,11 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND
     severity_text='INFO' AND
     attributes_string['method'] = 'GET' AND 
     resources_string['service.name'] = 'demo' AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY ts 
 ORDER BY ts ASC;
 ```
@@ -206,11 +206,11 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND 
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND 
     severity_text='INFO' AND 
     attribute_string_method = 'GET' AND 
     resource_string_service_name = 'demo' AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY ts 
 ORDER BY ts ASC;
 ```
@@ -234,11 +234,11 @@ SELECT
         FROM 
             signoz_logs.distributed_logs_v2  
         WHERE 
-            (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND
+            (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND
             severity_text='INFO' AND
             attributes_string['method'] = 'GET' AND 
             resources_string['service_name'] = 'demo' AND
-            ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+            ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
         GROUP BY ts 
         ORDER BY ts ASC
     )
@@ -264,10 +264,10 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND
     severity_text='INFO' AND
     attributes_string['method'] = 'GET' AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY service_name, ts 
 ORDER BY ts ASC;
 ```
@@ -288,9 +288,9 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND 
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND 
     mapContains(resources_string, 'k8s.cluster.name') AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY k8s_cluster_name, ts
 ORDER BY ts ASC;
 ```
@@ -310,10 +310,10 @@ SELECT
 FROM 
     signoz_logs.distributed_logs_v2  
 WHERE 
-    (timestamp >= {{.start_timestamp_nano}} AND timestamp <= {{.end_timestamp_nano}}) AND 
+    (timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano) AND 
     severity_text='ERROR' AND
     mapContains(resources_string, 'service.name') AND
-    ts_bucket_start BETWEEN {{.start_timestamp}} - 1800 AND {{.end_timestamp}}
+    ts_bucket_start BETWEEN $start_timestamp - 1800 AND $end_timestamp
 GROUP BY service_name,ts 
 ORDER BY ts ASC;
 ```

@@ -69,10 +69,8 @@ SigNoz supports three ways of creating variables: query, custom, and textbox.
 
 All metric queries can refer to variables using any of the following syntax.
 
-1. `{{.variable_name}}`
-2. `$variable_name`
-3. `[[variable_name]]`
-4. `{{variable_name}}`
+1. `$variable_name`
+
 
 For example, A PromQL query for service request rate using dynamic service selection would be.
 
@@ -101,7 +99,7 @@ The following example shows how to chain the service name variable to make the e
     ```sql
     SELECT DISTINCT JSONExtractString(labels, 'operation') AS operation
     FROM signoz_metrics.distributed_time_series_v4_1day
-    WHERE metric_name = 'signoz_calls_total' AND JSONExtractString(labels, 'service_name') IN {{.service_name}}
+    WHERE metric_name = 'signoz_calls_total' AND JSONExtractString(labels, 'service_name') IN $service_name
     ```
 
 ## Get Help
